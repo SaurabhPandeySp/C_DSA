@@ -1,0 +1,195 @@
+/***************************************************************************************************************
+ *  TAKE ONE INPUT FILE NAME AND ONE OUTPUT FILE NAME FROM THE COMMAND LINE ARGUMENTS. INPUT FILE WILL CONTAIN SOME    NUMBERS. STORE THESE NUMBERS IN A SINGLY LINKED LIST.TRAVERSE THE LIST AND DELETE ALL PRIME NUMBERS AND WRITE     THE REMAINING NUMBERS INTO THE OUTPUT FILE AND ON THE SCREEN.
+ **************************************************************************************************************/
+
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+typedef struct node
+{
+        int data ;
+        struct node *next;
+}node;
+
+
+#define SUCCESS 1
+#define FAILURE 0
+
+int insert_into_list(node ** ,int);
+void display(node *);
+int delete_prime(node * , FILE *);
+
+int main(int argc,char *argv[])
+{
+        if( 3 !=  argc )
+        {
+                printf("\n LESS NUMBER OF ARGUMENTS\n");
+                printf("\n enter <executable> <input filename> <output file name> \n");
+                return FAILURE;
+        }
+
+        node *head = NULL ;
+
+
+        FILE *fp = NULL ;
+
+        fp = fopen(argv[1],"r");
+
+        FILE *fout = NULL;
+
+        fout = fopen(argv[2],"w");
+
+        int num = 0;
+
+        while(1)
+        {
+                fscanf(fp,"%d",&num);
+
+                if(feof(fp))
+                {
+                        break ;
+                }
+
+                insert_into_list(&head,num);
+        }
+
+        display(head);
+
+        delete_prime(head,fout);
+
+        return SUCCESS;
+}
+
+
+int insert_into_list(node **head,int num)
+{
+        node *new = NULL ;
+
+        new = (node *) malloc (sizeof(node));
+
+        if( NULL == new)
+        {
+                printf("\n memory alloacation failure \n");
+                return FAILURE ;
+        }
+
+        new -> data = num ;
+        new -> next = NULL ;
+
+        if( NULL == *head)
+        {
+                *head = new ;
+        }
+
+        else
+        {
+                node *temp = *head ;
+
+                while(NULL != temp -> next)
+                {
+                        temp = temp -> next;
+                }
+
+                temp -> next = new ;
+        }
+
+        return SUCCESS;
+}
+
+
+void display(node *head)
+{
+        node *temp = NULL ;
+
+        temp = head ;
+
+        printf("\n the numbers stored in the list are \n");
+
+        while( NULL != temp)
+        {
+                printf("\n %d",temp -> data);
+
+                temp = temp->next;
+        }
+
+}
+
+
+int delete_prime(node *head , FILE *fout)
+{
+        node *temp = NULL ;
+
+        node *p = NULL ;
+
+        node *q = NULL;
+
+        temp = head ;
+
+        int flag = 0;
+
+        int i = 1;
+
+        while( NULL != temp )
+        {
+
+                flag = 0;
+
+                if( 1 == temp -> data || 2 == temp -> data)
+                {
+                        fprintf(fout,"%d",temp -> data);
+
+                        q = temp ;
+
+                        temp = temp -> next ;
+                }
+
+                else
+                {
+                        for( i=2;(i<(temp->data));i++)
+                        {
+                                if ((temp -> data)%i == 0)
+                                {
+                                        flag =1;
+                                }
+                        }
+
+                        if( 0 == flag)
+                        {
+
+                                printf("\n\n  %d is a prime number\n",temp -> data);
+
+                                p = temp;
+
+                                q -> next = p -> next;
+
+                                temp = temp  -> next ;
+
+                                free(p);
+
+                                p = NULL;
+                        }
+
+                        else
+                        {
+                                printf("\n %d",temp -> data);
+
+                                q = temp;
+
+                                fprintf(fout,"%d\n",temp -> data);
+
+                                temp = temp -> next;
+
+                        }
+                }
+
+
+        }
+
+        fclose(fout);
+
+
+        return SUCCESS;
+}
